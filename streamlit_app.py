@@ -2,6 +2,7 @@ import streamlit as st
 import numpy as np
 from PIL import Image
 import keras
+from huggingface_hub import hf_hub_download
 
 st.title("🧠 Brain Tumour Project")
 task = st.radio("Choose a task", ["Classification", "Segmentation"])
@@ -43,4 +44,5 @@ if uploaded_file is not None:
         mask = model.predict(arr)[0]
         mask = (mask > 0.5).astype(np.uint8) * 255
         st.image(mask, caption="Predicted Mask", use_container_width=True)
+
 
