@@ -49,3 +49,4 @@ if uploaded_file:
         mask = model.predict(img_array)[0]
         st.image(mask, caption="Predicted Mask", use_column_width=True)
 
+
