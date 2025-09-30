@@ -13,8 +13,8 @@ st.write("Choose a task (Classification or Segmentation) and upload an image.")
 task = st.selectbox("Choose a task", ["Classification", "Segmentation"])
 
 model_files = {
-    "Classification": "best_model_classification.keras",
-    "Segmentation": "best_model_segmentation.keras"
+    "Classification": "content/best_model_classification.keras",
+    "Segmentation": "content/best_model_segmentation.keras"
 }
 
 @st.cache_resource
@@ -22,6 +22,7 @@ def load_model(task_name: str):
     model_path = hf_hub_download(
         repo_id="Ahmed-Ashraf-00/brain_tumour_testing",
         filename=model_files[task_name],
+        revision="main",
         token=st.secrets.get("HF_TOKEN")
     )
     return keras.models.load_model(model_path)
