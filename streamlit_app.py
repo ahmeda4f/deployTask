@@ -1,49 +1,37 @@
 import streamlit as st
-from huggingface_hub import hf_hub_download, login
-from tensorflow import keras
 import numpy as np
 from PIL import Image
-
-if "HF_TOKEN" in st.secrets:
-    login(token=st.secrets["HF_TOKEN"])
+import keras
 
 st.title("🧠 Brain Tumour Project")
-st.write("Choose a task (Classification or Segmentation) and upload an image.")
-
-task = st.selectbox("Choose a task", ["Classification", "Segmentation"])
-
-model_files = {
-    "Classification": "content/best_model_classification.keras",
-    "Segmentation": "content/best_model_segmentation.keras"
-}
+task = st.radio("Choose a task", ["Classification", "Segmentation"])
+uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
 
 @st.cache_resource
-def load_model(task_name: str):
-    model_path = hf_hub_download(
-        repo_id="Ahmed-Ashraf-00/brain_tumour_testing",
-        filename=model_files[task_name],
-        revision="main",
-        token=st.secrets.get("HF_TOKEN")
-    )
+def load_model(task):
+    if task == "Classification":
+        model_path = "content/best_model_classification.keras"
+    else:
+        model_path = "content/best_model_segmentation.keras"
     return keras.models.load_model(model_path)
 
-model = load_model(task)
-
-uploaded_file = st.file_uploader("Upload an MRI Image", type=["png", "jpg", "jpeg"])
-
-if uploaded_file:
-    img = Image.open(uploaded_file).convert("RGB")
-    st.image(img, caption="Uploaded Image", use_column_width=True)
-
-    img_resized = img.resize((224, 224))
-    img_array = np.array(img_resized) / 255.0
-    img_array = np.expand_dims(img_array, axis=0)
+if uploaded_file is not None:
+    image = Image.open(uploaded_file).convert("RGB")
+    st.image(image, caption="Uploaded Image", use_container_width=True)
+    model = load_model(task)
 
     if task == "Classification":
-        pred = model.predict(img_array)
-        class_id = np.argmax(pred, axis=1)[0]
-        st.write("Prediction (class index):", class_id)
-        st.write("Raw output:", pred.tolist())
+        img = image.resize((224, 224))
+        arr = np.array(img) / 255.0
+        arr = np.expand_dims(arr, axis=0)
+        preds = model.predict(arr)
+        label = np.argmax(preds, axis=1)[0]
+        st.write("Prediction:", label)
+
     else:
-        mask = model.predict(img_array)[0]
-        st.image(mask, caption="Predicted Mask", use_column_width=True)
+        img = image.resize((128, 128))
+        arr = np.array(img) / 255.0
+        arr = np.expand_dims(arr, axis=0)
+        mask = model.predict(arr)[0]
+        mask = (mask > 0.5).astype(np.uint8) * 255
+        st.image(mask, caption="Predicted Mask", use_container_width=True)
