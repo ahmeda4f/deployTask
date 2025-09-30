@@ -1,8 +1,12 @@
+import os
 import streamlit as st
-from huggingface_hub import hf_hub_download
+from huggingface_hub import hf_hub_download, login
 from tensorflow import keras
 import numpy as np
 from PIL import Image
+
+if "HF_TOKEN" in st.secrets:
+    login(token=st.secrets["HF_TOKEN"])
 
 st.title("🧠 Brain Tumour Project")
 st.write("Choose a task (Classification or Segmentation) and upload an image.")
@@ -15,7 +19,7 @@ model_files = {
 }
 
 @st.cache_resource
-def load_model(task_name):
+def load_model(task_name: str):
     model_path = hf_hub_download(
         repo_id="Ahmed-Ashraf-00/brain_tumour_testing",
         filename=model_files[task_name]
@@ -36,7 +40,9 @@ if uploaded_file:
 
     if task == "Classification":
         pred = model.predict(img_array)
-        st.write("Prediction:", pred)
+        class_id = np.argmax(pred, axis=1)[0]
+        st.write("Prediction (class index):", class_id)
+        st.write("Raw output:", pred.tolist())
     else:
         mask = model.predict(img_array)[0]
-        st.image(mask, caption="Predicted Mask")
+        st.image(mask, caption="Predicted Mask", use_column_width=True)
