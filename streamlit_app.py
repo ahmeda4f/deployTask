@@ -18,6 +18,7 @@ model_files = {
     "Segmentation": "best_model_segmentation.keras"
 }
 
+
 @st.cache_resource
 def load_model(task_name: str):
     model_path = hf_hub_download(
@@ -48,5 +49,6 @@ if uploaded_file:
     else:
         mask = model.predict(img_array)[0]
         st.image(mask, caption="Predicted Mask", use_column_width=True)
+
 
 
