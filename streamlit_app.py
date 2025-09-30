@@ -21,9 +21,11 @@ model_files = {
 @st.cache_resource
 def load_model(task_name: str):
     model_path = hf_hub_download(
-        repo_id="Ahmed-Ashraf-00/brain_tumour_testing",
-        filename=model_files[task_name]
-    )
+    repo_id="Ahmed-Ashraf-00/brain_tumour_testing",
+    filename=model_files[task_name],
+    token=os.getenv("HF_TOKEN")
+)
+
     return keras.models.load_model(model_path)
 
 model = load_model(task)
@@ -46,3 +48,4 @@ if uploaded_file:
     else:
         mask = model.predict(img_array)[0]
         st.image(mask, caption="Predicted Mask", use_column_width=True)
+
