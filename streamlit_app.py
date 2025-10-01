@@ -20,7 +20,7 @@ def load_model(task):
     else:
         model_path = hf_hub_download(
             repo_id="Ahmed-Ashraf-00/brain_tumour_testing",
-            filename="content/best_model_segmentation.keras",
+            filename="best_model_segmentation.keras",
             token=st.secrets.get("HF_TOKEN")
         )
     return keras.models.load_model(model_path, compile=False)
@@ -37,8 +37,8 @@ if uploaded_file is not None:
             arr = np.repeat(arr, 3, axis=-1)
         arr = preprocess_input(arr.astype(np.float32))
         arr = np.expand_dims(arr, axis=0)
-        preds = model.predict(arr)
-        label = int(preds[0][0] > 0.5)
+        preds = model.predict(arr)[0][0]
+        label = "no" if preds > 0.5 else "yes"
         st.write("Prediction:", label)
     else:
         img = image.resize((128, 128))
@@ -49,5 +49,3 @@ if uploaded_file is not None:
         mask = model.predict(arr)[0]
         mask = (mask > 0.5).astype(np.uint8) * 255
         st.image(mask, caption="Predicted Mask", use_container_width=True)
-
-
