@@ -14,7 +14,7 @@ def load_model(task):
     if task == "Classification":
         model_path = hf_hub_download(
             repo_id="Ahmed-Ashraf-00/brain_tumour_testing",
-            filename="content/best_model_classification.keras",
+            filename="best_model_classification.keras",
             token=st.secrets.get("HF_TOKEN")
         )
     else:
@@ -49,3 +49,4 @@ if uploaded_file is not None:
         mask = model.predict(arr)[0]
         mask = (mask > 0.5).astype(np.uint8) * 255
         st.image(mask, caption="Predicted Mask", use_container_width=True)
+
