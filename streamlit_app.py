@@ -5,7 +5,7 @@ import keras
 from huggingface_hub import hf_hub_download
 from tensorflow.keras.applications.resnet import preprocess_input
 
-st.title("🧠 Brain Tumour Project")
+st.title("🧠 Brain Tumor Project")
 task = st.radio("Choose a task", ["Classification", "Segmentation"])
 uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
 
@@ -49,6 +49,7 @@ if uploaded_file is not None:
         mask = model.predict(arr)[0]
         mask = (mask > 0.5).astype(np.uint8) * 255
         st.image(mask, caption="Predicted Mask", use_container_width=True)
+
 
 
 
