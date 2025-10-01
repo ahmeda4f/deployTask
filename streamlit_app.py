@@ -50,3 +50,4 @@ if uploaded_file is not None:
         mask = (mask > 0.5).astype(np.uint8) * 255
         st.image(mask, caption="Predicted Mask", use_container_width=True)
 
+
